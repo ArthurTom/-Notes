@@ -1,0 +1,72 @@
+# 什么叫多态？
+### 官方概括
+  事务在运行过程中存在不同的状态。
+
+### 多态的前提
+   1. 继承关系
+   2. 子类重写父类的方法
+   3. 父类引用指向子类对象
+### 多态典型的demo
+```
+public class duotai {
+
+	public static void main(String[] args) {
+		Animal am = new Cat();
+		am.eat(); // 猫在吃饭
+		am.sleep(); // 动物在睡觉
+		am.run(); // 动物在奔跑
+
+		System.out.println(am.num); // 10
+		System.out.println(am.age); // 20
+	}
+}
+```
+```
+public class Animal {
+	int num = 10;
+	static int age = 20;
+
+	public void eat() {
+		System.out.println("动物吃饭");
+	}
+
+	public static void sleep() {
+		System.out.println("动物在睡觉"
+		);
+	}
+
+	public void run() {
+		System.out.println("动物在奔跑");
+	}
+}
+```
+```
+public class Cat extends Animal {
+	int num = 80;
+	static String name = "tomCat";
+
+	public void eat() {
+		System.out.println("猫吃饭");
+	}
+
+	public static void sleep() {
+		System.out.println("猫在睡觉");
+	}
+
+	public void catchMouse() {
+		System.out.println("猫在抓老鼠");
+	}
+}
+```
+<font color=red>*输出结果:*</font>
+                猫吃饭    
+                动物在睡觉
+                动物在奔跑
+                10
+                20
+### 结论口诀：Parent mParent=new Son();
+    1. 成员变量：编译看左（父类），运行看左（父类）
+    2. 成员方法：编译看左（父类），运行看右（子类）
+    3. 静态方法：编译看左（父类），运行看左（父类）
+
+*个人理解:* parent mParent 指向了孩子Son对象（子类向上转型成父类，父类拥有子类重写的父类的成员方法。成员变量和静态方法不变，仍是父类）。 由于Son继承Parent，重写了Parent的一些方法（成员方法or静态方法）.父类Parent的成员方法被重写了，所以，mParent.xx（）方法调用的是重写的方法（即运行看右）。而Parent中的静态方法，是随着类Parent创建就加载的，所以即使子类Son重写，mParent调用的也是mParent中父类加载静态方法（静态方法，运行看左）。而Son对象中的成员变量，由于是向上转型，仅仅是将Son子类的重写的成员方法付给了父类(成员变量：运行看右)。
