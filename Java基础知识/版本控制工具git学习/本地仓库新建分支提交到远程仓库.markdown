@@ -1,0 +1,24 @@
+## 创建分支提交到gitHub
+### 前提
+  在本地仓库和远程github仓库关联的情况下，某天我有个需求，要创建一个分支管理项目。
+### 操作
+1. 创建一个分支并切换``` git checkout -b  分支名```
+2. 查看本地所有的分支：``` git branch -a ```
+
+```
+$ git branch -a
+  master
+* sources
+  remotes/origin/master
+
+   ```
+显示当前本地分会有两个，master和sources，其中*说明当前git所处的分支是source.remotes/origin/master 表示远程目前只有一个分支master.
+3. ```git commit -m ""```
+4. ```git push -u origin sources```
+*注*：使用git push 会报
+```
+fatal: The current branch sources has no upstream branch.
+To push the current branch and set the remote as upstream, use
+git push --set-upstream origin sources
+```
+由于我们远程仓库中没有这个source的分支，所以需要使用-u 命令在提交同时创建远程分支。
