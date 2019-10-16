@@ -1,0 +1,140 @@
+
+
+### 依赖倒转原则
+#### 介绍
+  1. 高层模块不应该依赖底层模式，二者都应依赖其抽象。
+  2. 抽象不应该依赖细节，细节应该依赖抽象
+  3. 依赖倒转的中心思想 <font color=red>*面向接口编程*</font>
+  4. 设计理念：相对于细节的多变性，抽象的东西要稳定的多。以抽象为基础搭建的架构比基础的架构要稳定的多。在java中，抽象指的是接口或者抽象类，细节就是具体的实现类。
+  5. 使用接口或抽象类的目的是制定好规范，而不涉及具体的操作，把展现细节的任务交给他们的实现类去完成。
+
+### 实际应用
+  ```
+    public class DependenceInversion {
+	public static void main(String[] args) {
+		Person person = new Person();
+		person.received(new Email());
+   	  }
+    }
+  ```
+  ```
+  public class Person {
+	public void received(Email email) {
+		System.out.println(email.getInfo());
+	}
+}
+  ```
+  ```
+  public class Email {
+	public String getInfo() {
+		return "电子邮箱：hello 依赖倒转原则";
+	}
+}
+
+  ```
+此时要求加入功能，Person要可以接受到微信、短信等的信息。
+1. 常规简单的做法是新增微信等的类，然后Person也要新增相应的接受方法。
+2. <font color=red>解决思路：</font>引入一个抽象的接口IReceiver,标识接受者，Person类与接口IReceiver发生依赖。Email和微信、短信有相同的特性，他们各自实现IReceiver接口就可以。
+
+### 改进型
+ ```
+ interface ChartEach{ // 将相同的功能抽到接口中
+   String getInfo();
+ }
+ ```
+ ```
+  public WeiXin implement ChartEach{  // 实现接口，根据自身重写getInfo()方法
+    @Override
+    public String getInfo(){
+      return "微信:hello 依赖倒转原则"
+    }
+  }
+ ```
+```
+ public void Person(){
+   public void received(ChartEach mChartEach){ // 通过接口传递实现依赖的方法，展示不同的子类的方法
+    mChartEach.getInfo();
+   }
+ }
+```
+
+
+
+
+
+
+
+
+
+
+### 依赖传递的三种方式
+ 1.  通过接口传递实现依赖：
+    ```
+     interface IOpenAndClose(){ //
+       open(ITV tv);   // ITV 接口
+     }
+    ```
+    ```
+    interface ITV{ // 实现ITV,重写play()实现不同的结果
+      void play();
+    }
+    ```
+    ```
+    class OpenAndClose implements IOpenAndClose{
+      @Ovrrde
+      public void open(ITV tv){
+        tv.play();
+      }
+    }
+    ```
+  2. 通过构造方法依赖传递
+     ```
+     interface IOpenAndClose{
+      open();
+     }
+     ```
+     ```
+     interface ITV{
+       play();
+     }
+     ```
+     ```
+     class OpenAndClose implements IOpenAndClose{
+       public ITV tv; // 成员变量
+       public OpenAndClose(ITV tv){ // 构造器参数是接口
+         this.tv=tv;
+       }
+       @Ovrride
+       public void open(){
+         this.tv.play();
+       }
+     }
+     ```
+  3. 通过setter方法传递
+```
+interface IOenAndClose{
+  void open();
+  void setTv(ITV tv);
+}
+```
+```
+interface ITV{
+  void play();
+}
+```
+```
+class OpenAndClose implements IOpenAndClose{
+  private ITV tv;
+  public void setTv(ITV tv){ // 通过方法
+    this.tv=tv;
+  }
+  public void open(){
+    this.tv.play();
+  }
+}
+```
+
+### 依赖倒转原则
+1. 低层模块尽量都要有抽象类或接口，或者两者都有，程序稳定性更好。
+2. 变量的声明类型尽量是抽象类或接口，这样我们的变量引用和实际对象间，就存在一个缓冲层，利于程序扩展和优化.(父类接口 指向子类,子类添加功能只需增减父类,所有子类就可以拥有相关的功能)
+3. 继承时遵循里氏替换原则.
