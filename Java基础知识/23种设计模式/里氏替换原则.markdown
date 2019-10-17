@@ -1,0 +1,78 @@
+## 里氏替换原则
+
+#### 面向对象中继承会出现的问题
+1. 在继承中，父类已经实现好的方法，实际上是在设定好了规范和契约;虽然父类不要求所有的子类必须遵循这些契约，但是如果子类对象父类中实现的方法任意的修改，就会对整个的继承系统造成破坏。
+2. 继承在给程序设计带来便利的同时，也带来了弊端。如果一个类被其他的类所继承，则当这个类需求修改时，必须要考虑到所有的子类。如果父类修改后，子类可能产生故障。
+#### 里氏替换原则
+1. 如果对每个类型为T1的对象O1,都有类型T2的对象O2,使得以T1定义的所有程序P在所有的对象O1都替换O2时，程序P的行为没有发生变化，那么类型T2是类型T1的子类型。换句话说：所有引用基类的地方必须能透明的使用其子类的对象。
+2. 在继承中，子类尽量的不要重写父类的方法。
+3. 继承实际上让两个类耦合性增强，在适当的情况下 ，可以通过聚合、组合、依赖解决问题。
+#### 改进前的实例
+```
+public class Caculation1 {
+	public int funcation(int num1, int num2) {
+		return num1 + num2;
+	}
+}
+
+```
+```
+public class Caculation2 extends Caculation1 {
+	@Override
+	public int funcation(int num1, int num2) {
+		return num1-num2;
+	}
+}
+```
+```
+public class CaculationMain {
+	public static void main(String[] args) {
+      Caculation1 caculation1=new Caculation1();
+      System.out.println("caculation1的打印："+caculation1.funcation(10,5));
+      Caculation2 caculation2=new Caculation2();
+      System.out.println("caculation2的打印："+caculation2.funcation(10,5));
+	}
+}
+```
+输出：
+caculation1的打印：15
+caculation2的打印：5
+
+可以看到Caculation2继承Caculation1并重写了方法，重写的方法变成了减法。如果在需要使用+法，只能我们新增方法，显然这种设计方法不好。
+
+#### 重新设计后
+```
+public class Caculation1 {
+	public int funcation(int num1, int num2) {
+		return num1 + num2;
+	}
+}
+```
+```
+public class Caculation2 extends Caculation1 {
+	private Caculation1 caculation1=new Caculation1();
+	@Override
+	public int funcation(int num1, int num2) {
+		return num1-num2;
+	}
+
+	public int funcaton2(int num1,int num2){
+		return this.caculation1.funcation(num1,num2);// 使用组合
+	}
+}
+```
+```
+public class CaculationMain {
+	public static void main(String[] args) {
+      Caculation1 caculation1=new Caculation1();
+      System.out.println("caculation1的打印："+caculation1.funcation(10,5));
+      Caculation2 caculation2=new Caculation2();
+      System.out.println("caculation2的打印："+caculation2.funcation(10,5));
+	}
+}
+```
+结果：
+caculation1的打印：15
+caculation2的打印：15
+
+Caculation2重写了父类的方法，将+法重写成-法，同时我们新增了一个方法funcation2(),在Caculation2中调用实例Caculation1的funcation的方法，使用其-法。
