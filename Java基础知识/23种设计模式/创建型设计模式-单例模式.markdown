@@ -1,0 +1,248 @@
+###  创建型设计模式--单例模式
+#### 单例
+ <font color=red>*简介：*</font>采取一定的方法保证整个系统中，对某个类只能存在一个对象实例，并且该类只能存在一个取得其对象实例的方法。
+#### 常见的单例模式
+    常见的单例模式有八种：
+    1. 饿汉式（静态常量）
+    2. 饿汉式（静态代码块）
+    3. 懒汉式（线程不安全）
+    4. 懒汉式（线程安全，同步方法）
+    5. 懒汉式（线程安全，同步代码块）
+    6. 双重检查
+    7. 静态内部类
+    8. 枚举
+
+##### 饿汉式（静态常量）
+  1. 构造器私有化
+  2. 类内部创建对象
+  3. 向外暴露一个静态的公共方法。getInstance
+
+```
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/20 15:04
+ * 功能：饿汉式静态变量
+ */
+public class Singleton {
+	// 1.构造函数私有化
+	private Singleton() {
+	}
+    // 2.本类内部创建对象实例
+	private final static Singleton instance = new Singleton();
+    //3. 提供一个公共的静态方法，返回实例对象
+	public static Singleton getInstance() {
+		return instance;
+	}
+}
+
+```
+
+<font color=red>*优缺点:*</font></br>
+  -  优点:
+      1. 写法简单，在类装载的时候就完成实例化，避免了线程同步的问题
+  - 缺点:
+      1. 在类装载的时候完成实例化，没有达到lazy loading的效果。如果从始至终没有使用过这个实例，则会造成内存浪费
+  - <font color=red>结论：这种设计模式可用，可能会造成内存浪费（在确定实例一定为被使用的时候，使用）</font></br>
+
+##### 饿汉式（静态代码块）
+```
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/20 15:39
+ * 功能：饿汉式（静态变量的另一种写法）
+ */
+public class Singleton2 {
+	private static Singleton2 instance;
+  // 1.构造方法私有化
+	private Singleton2() {}
+    // 2.实例化方法放到静态代码块中
+	static {
+		instance = new Singleton2();
+	}
+	public static Singleton2 getInstance() {
+		return instance;
+	}
+}
+```
+<font color=red>*优缺点:*</font></br>
+- 优点：同上，只不过将类实例化的过程放到静态代码块中
+- 缺点：同上
+- <font color=red>结论：这种设计模式可用，可能会造成内存浪费</br>
+
+##### 懒汉式（线程不安全）
+```
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/20 15:51
+ * 功能：懒汉式(线程不安全)
+ */
+public class Singleton3 {
+	// 1. 私有化的构造器
+	private Singleton3() {
+	}
+
+	private static Singleton3 singleton3;
+
+	// 提供一个静态的公有方法，当使用该方法时，才去创建instance3
+	public static Singleton3 getInstance() {
+		if (singleton3 == null) {
+			singleton3 = new Singleton3();
+		}
+		return singleton3;
+	}
+}
+
+```
+优缺点：
+ - 优点：只能在单线程下使用
+ - 缺点：<font color=back>多线程下，一个线程进入if(singleton3==null)判断语句，还未来得及往下执行，另一个线程也通过了这个判断语句，这时候便会产生多个实例。所以多线程下不可以使用这种方法。</font>
+ - 总结：在实际开发中不要使用这种模式
+ #### 懒汉式（线程安全，同步方法）
+
+```
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/20 16:03
+ * 功能：懒汉式，线程安全，同步方法
+ */
+public class Singleton4 {
+	//1.构造器私有化
+	private Singleton4() {
+	}
+
+	private static Singleton4 instace;
+    // 2. 加入同步代码，解决线程不安全的问题
+	public static synchronized Singleton4 getInstance() {
+		if (instace == null) {
+			instace = new Singleton4();
+		}
+		return instace;
+	}
+}
+
+```
+<font color=red>优缺点</font>
+ - 优点：同上
+ - 缺点：效率太低，每个线程在获取类的实例的时候，执行getInstance()方法，都要进行同步。而其实这个方法只执行一次实例化代码就够了，后面想获取该类实例，直接return就行，方法进行同步的效率太低了。
+ - 总结：实际开发中不推荐
+ ##### 懒汉式（线程安全，同步代码块）
+
+```
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/20 16:26
+ * 功能：懒汉式（线程安全，同步代码块--但是不能真正实现线程安全）
+ */
+public class Singleton5 {
+	private Singleton5() {
+	}
+
+	private static Singleton5 instance;
+
+	public Singleton5 getInstance() {
+		if (instance == null) {
+			synchronized (Singleton5.class) {
+				instance = new Singleton5();
+			}
+		}
+		return instance;
+	}
+}
+```
+<font color=red>优缺点:</font>
+- 优点：这种方法，是上面方法实现方式的改进。因为同步方法效率太低，改为同步产生实例化的代码块。
+- 缺点：但是这种同步方法不能起到线程同步的作用。假如一个线程进入if(instance==null)判断语句，还未来得及往下执行，另一个线程也通过这个判断语句，这时便产生多个实例.
+- 总结：实际开发中,不能使用这种方法.
+
+##### 双重检查(推荐使用)
+```
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/20 17:14
+ * 功能：双重检查
+ */
+public class Singleton6 {
+	//
+	private static volatile Singleton6 instance;
+
+	private Singleton6() {
+	}
+
+	public Singleton6 getInstance() {
+		if (instance == null) {
+			synchronized (Singleton6.class) {
+				instance = new Singleton6();
+			}
+		}
+		return instance;
+	}
+}
+```
+优缺点:
+- 优点:延迟加载,线程安全,效率高;if(instance==null)双重检查确保线程安全；实例化代码只执行一次，后面在访问的时候，判断if(instance==null),直接return 实例化对象。避免反复进行方法同步。
+- 缺点:无
+- 总结:实际开发中推荐这种方式
+
+#### 静态内部类
+```
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/20 19:23
+ * 功能：静态内部类
+ */
+public class Singleton7 {
+	//1.私有的构造器
+	private Singleton7() {
+	}
+
+	//2 静态内部类，在静态内部类中写一个静态属性
+	private static class SingletonInstance {
+		private static final Singleton7 instance = new Singleton7();
+	}
+
+	// 写一个静态的公有方法，直接返回SingletonInstance.instance
+	public static Singleton7 getInstance() {
+		return SingletonInstance.instance;
+	}
+
+}
+
+```
+优缺点：
+- 优点：1. 采用类加载机制保证了初始化实例只有一个线程。2.静态内部类在外部类被装载的时候并不会立即实例化，在需要实例化的时候，调用getInstance()方法，才会装载静态内部类，从而完成外部类的实例化。3.由于类的静态属性只会在第一次加载类的时候初始化，所以这里jvm帮组我们保证了线程的安全。在初始化的时候，别的线程无法进入。
+- 总结：推荐使用这种方式
+
+##### 枚举
+```
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/20 19:34
+ * 功能：枚举
+ */
+public class Singleton10 {
+	public static void main(String[] args) {
+		Singleton singleton = Singleton.INSTANCE;
+		singleton.printMsg();
+		Singleton singleton1 = Singleton.INSTANCE;
+		System.out.println("singleton和singleton1是一个对象" + (singleton.hashCode() == singleton1.hashCode()));
+	}
+	enum Singleton {
+		INSTANCE;
+		public void printMsg() {
+			System.out.println("枚举单例模式，打印");
+		}
+	}
+}
+
+```
+优缺点：
+- 优点：1.5版本后添加的枚举来实现单例模式，不仅能避免多线程同步的问题，而且还能防止反序列化重新创建新的对象
+-总结：推荐使用
