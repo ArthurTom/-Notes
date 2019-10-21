@@ -1,0 +1,268 @@
+#### 简单工厂模式（静态工厂模式）
+##### 需求
+  制作披萨项目：要求便于披萨种类的扩展，要便于维护
+  - 萨的种类很多（greekPizz、CheesePizz等）
+  - 披萨的制作有prepare、bake、cut、box
+  - 完成披萨的订购
+
+##### 传统的思路
+- uml类图
+   ![](https://github.com/ArthurTom/-Notes/raw/master/Java基础知识/图片仓库/Pizza普通类图.png)
+
+- 代码
+```
+  /**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/21 11:18
+ * 功能：披萨普通的写法
+ */
+public abstract class Pizza {
+	private String name;
+
+	abstract void prepare(); // 根据材料不同，制作不同的Pizza
+
+	public void bake() { // 烘培
+		System.out.println("准备烘焙");
+
+	}
+
+	public void cut() { // 切块
+    System.out.println("准备切块");
+	}
+
+	public void box() { // 装盒
+     System.out.println("准备装盒子");
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+}  
+```
+```
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/21 11:21
+ * 功能：A种披萨
+ */
+public class APizza extends Pizza {
+	@Override
+	void prepare() {
+     System.out.println("A类披萨准备所需的材料");
+	}
+}
+```
+```
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/21 11:21
+ * 功能：B种Pizza
+ */
+public class BPizza extends Pizza {
+	@Override
+	void prepare() {
+		System.out.println("给B类pizza制作准备材料");
+	}
+}
+```
+```
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/21 11:33
+ * 功能：购买的订单
+ */
+public class PizzaOrder {
+	public static void main(String[] args) {
+		new PizzaStore();
+	}
+}
+```
+```
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/21 11:22
+ * 功能：制作披萨的商店
+ */
+public class PizzaStore {
+
+	public PizzaStore() {
+		Pizza mPizza = null;
+		String PizzaType; // 披萨种类
+		do {
+			PizzaType = getPizzaType();
+			if (PizzaType.equals("APizza")) {
+				mPizza = new APizza();
+				mPizza.setName("APizza");
+			} else if (PizzaType.equals("BPizza")) {
+				mPizza = new BPizza();
+				mPizza.setName("BPizza");
+			} else {
+				break;
+			}
+			mPizza.prepare();
+			mPizza.bake();
+			mPizza.cut();
+			mPizza.box();
+		} while (true);
+
+	}
+
+	public String getPizzaType() { // 获取披萨的种类
+		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+		System.out.println("客户输入Pizza的类型：");
+		String str = null;
+		try {
+			str = bufferedReader.readLine();
+			return str;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return e.getMessage();
+		}
+
+	}
+}
+```
+输出：
+客户输入Pizza的类型：
+APizza
+A类披萨准备所需的材料
+准备烘焙
+准备切块
+准备装盒子
+客户输入Pizza的类型：
+BPizza
+给B类pizza制作准备材料
+准备烘焙
+准备切块
+准备装盒子
+客户输入Pizza的类型：
+
+*传统的优缺点：*
+   1. 优点：比较好理解，简单易操作
+   2. 缺点：违反了ocp原则，当我们给类新增新功能的时候，需要修改的地方太多。
+
+##### 简单工厂模式
+- 改进思路
+
+
+   根据Pizza中有多个类型的，可以根据参数的不同返回不同的实例，创建一个SimpleFactory类专门的负责创建各种不同的实例。---简单工厂模式。
+
+- 简单工厂模式
+   - 组成：抽象的产品（如Pizza抽象类）、具体的产品（如APizza）、具体的工厂（专门创建、管理对象）
+   - 定义一个创建对象的类，由这个类来封装实例化对象的行为（SimpleFactory类）。
+   - 当软件开发中，会用到大量的创建某种类、某批对象时，就会使用到工厂模式。
+
+
+##### 简单工厂改进代码
+```
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/21 16:21
+ * 功能：简单工厂模式--静态工厂模式
+ */
+public class SimpleFactory {
+
+	// 1. 创建对象方法：根据用户的输入类型，来创建对象
+	public static Pizza createPizza(String PizzaType) {
+		System.out.println("开始使用简单工厂模式创建对应的对象");
+		Pizza mPizza = null;
+		if (PizzaType.equals("APizza")) {
+			mPizza = new APizza();
+		} else if (PizzaType.equals("BPizza")) {
+			mPizza = new BPizza();
+		} else if (PizzaType.equals("CPizza")) {
+			mPizza = new CPizza();
+		} else {
+			System.out.println("输入的类型没有，请重新输入");
+		}
+		return mPizza;
+	}
+}
+
+```
+```
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/21 11:22
+ * 功能：制作披萨的商店
+ */
+public class PizzaStore {
+	// 1. 构造器中调用制作Pizza的步骤方法
+	public PizzaStore() {
+		PizzaCooker();
+	}
+
+	// 2.制作Pizza的步骤方法
+	public void PizzaCooker() {
+		Pizza mPizza = null;
+		String PizzaType; // 披萨种类
+		do {
+			PizzaType = getPizzaType();
+			mPizza = SimpleFactory.createPizza(PizzaType); // 调用工厂的方法创建对象
+			mPizza.setName(PizzaType);
+			if (mPizza != null) {
+				mPizza.prepare();
+				mPizza.bake();
+				mPizza.cut();
+				mPizza.box();
+			}else {
+				System.out.println("订购的Pizza失败");
+				break;
+			}
+		} while (true);
+
+	}
+
+	//3.获取用户的输入的Pizza的种类
+	public String getPizzaType() {
+		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+		System.out.println("客户输入Pizza的类型：");
+		String str = null;
+		try {
+			str = bufferedReader.readLine();
+			return str;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return e.getMessage();
+		}
+
+	}
+}
+```
+```
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/21 11:33
+ * 功能：购买的订单--程序的入口
+ */
+public class PizzaOrder {
+	public static void main(String[] args) {
+		new PizzaStore();
+	}
+}
+
+```
+其他类不做改变，同未改进前的。
+
+##### 总结
+ - 适用场景：
+   - 工厂类负责的创建的对象少：由于创建对象少，不会造成工厂中业务逻辑的复杂
+   - 客户端只知道传入的类型，对于如何创建对象不关心：对于传入标识，创建不同的对象
+
+ - 缺点
+   - 工厂类一个人做了所有的对象的实例化，一旦出问题所有都无法正常的工作。
+   - 新增一个工厂类，会增加程序的复杂度和理解难度
+   - 新增新产品不得不修改工厂类，可能导致工厂逻辑过于复杂，
+   - 简单工厂模式使用静态工厂方法，造成工厂角色无法形成基于继承的等级结构。
+
+
+##### 源码demo
+[简单工厂模式源码demo](https://github.com/ArthurTom/-Notes/tree/master/%E5%AD%A6%E4%B9%A0%E6%BA%90%E7%A0%81/SingletonMode)
