@@ -1,0 +1,170 @@
+#### 抽象工厂模式
+#####定义
+- 四部分组成
+  - 抽象工厂类：定义一个抽象类，含有:public 抽象产品类 createProduct()的抽象方法（多个）
+  - 具体工厂类：实现抽象工厂类，实现具体的实例化产品类
+  - 抽象产品类：一般是接口，含有产品的一些方法
+  - 具体产品类：实现接口的具体产品类
+
+##### UML图
+![](https://github.com/ArthurTom/-Notes/raw/master/Java%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/%E5%9B%BE%E7%89%87%E4%BB%93%E5%BA%93/%E6%8A%BD%E8%B1%A1%E5%B7%A5%E5%8E%82UML.svg.png)
+##### 实例代码
+    汽车厂生产不仅生产燃油汽车，同时生产电动汽车。对于抽象工厂模式来说汽车厂就是所有汽车品牌生产商的父类（抽象父类），上汽集团和一汽集团是他的子类（继承抽象父类）他们都可以生产出来上汽牌燃油车、上汽牌电动车、一汽牌燃油车、一汽牌电动车。燃油汽车和电动汽车（抽象产品类--接口）是所有品牌燃油车和电动车的父类。而各种品牌下的燃油车和电动车是具体的产品类。
+
+```
+
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/22 15:00
+ * 功能：抽象工厂类
+ */
+public abstract class AbstractFactory {
+	public abstract GasCar createGasCar(); // 创建燃油汽车抽象类
+	public abstract ElectricCar createElectricCar(); // 创建电动汽车的抽象类
+}
+
+```
+```
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/22 15:08
+ * 功能：上海汽车制造厂
+ */
+public class ShaiFactory extends AbstractFactory {
+	@Override
+	public GasCar createGasCar() {
+		return new ShangHaiGasCar();
+	}
+
+	@Override
+	public ElectricCar createElectricCar() {
+		return new ShangHaiElectricCar();
+	}
+}
+```
+```
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/22 15:08
+ * 功能：一汽汽车制造厂
+ */
+public class YiQiFactory extends AbstractFactory {
+	@Override
+	public GasCar createGasCar() {
+		return new YiQiGasCar();
+	}
+
+	@Override
+	public ElectricCar createElectricCar() {
+		return new YiQiElectricCar();
+	}
+}
+
+```
+```
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/22 15:06
+ * 功能：电动汽车
+ */
+public interface ElectricCar {
+	void assembleElectric(); // 拼装电动汽车
+}
+```
+```
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/22 15:06
+ * 功能：燃油汽车
+ */
+public interface GasCar {
+
+	void assembleGas(); // 拼装燃油汽车
+}
+
+```
+```
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/22 15:14
+ * 功能：上海电动汽车
+ */
+public class ShangHaiElectricCar implements ElectricCar {
+	@Override
+	public void assembleElectric() {
+		System.out.println("上海牌电动汽车组装完毕");
+	}
+}
+
+```
+```
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/22 15:12
+ * 功能：上海牌燃油汽车
+ */
+public class ShangHaiGasCar implements GasCar {
+
+	@Override
+	public void assembleGas() {
+		System.out.println("上海牌燃油汽车组装完成");
+	}
+}
+
+```
+```
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/22 15:14
+ * 功能：一汽牌电动汽车
+ */
+public class YiQiElectricCar implements ElectricCar {
+	@Override
+	public void assembleElectric() {
+		System.out.println("一汽牌电动汽车组装完毕");
+	}
+}
+
+```
+```
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/22 15:13
+ * 功能：一汽燃油汽车
+ */
+public class YiQiGasCar implements GasCar {
+	@Override
+	public void assembleGas() {
+		System.out.println("一汽 燃油汽车组装完毕");
+	}
+}
+
+```
+```
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/22 15:16
+ * 功能：汽车生产入口
+ */
+public class ComeInMain {
+	public static void main(String[] args) {
+		AbstractFactory mFactory = new ShaiFactory();
+		mFactory.createElectricCar().assembleElectric();
+		mFactory.createGasCar().assembleGas();
+
+		AbstractFactory yiqiFactory = new YiQiFactory();
+		yiqiFactory.createElectricCar().assembleElectric();
+		yiqiFactory.createGasCar().assembleGas();
+	}
+}
+```
