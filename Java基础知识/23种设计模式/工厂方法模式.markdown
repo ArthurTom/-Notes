@@ -1,0 +1,253 @@
+#### 工厂方法模式
+##### 工厂方法模式定义
+      定义一个创建对象的接口，让子类决定实例化的类。（工厂方法模式将对象的实例化推迟到子类）
+##### 工厂方法模式组成
+  - 抽象产品（抽象类：具体产品的父类）
+  - 具体产品（多个）
+  - 抽象工厂（抽象类：具体工厂父类）
+  - 具体工厂（多个）
+
+
+##### 使用场景
+    大众汽车厂生产汽车，对于车企来说无非是组装一些配件。但是每个品牌下都有一些子品牌，如：捷达、帕沙特和奥迪。
+    所有的车都是有三大件组成但又有一些差别。
+
+  - 多工厂模板
+
+```
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/21 20:47
+ * 功能：抽象产品类：假设汽车由：发动机、车标、变速箱组成
+ */
+public abstract class Car {
+
+	public Car() {
+		engine();
+		gearbox();
+		logo();
+	}
+
+	public abstract void engine(); // 发动机
+
+	public abstract void gearbox();// 变速箱
+
+	public abstract void logo();// 车标
+
+}
+
+```
+```
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/21 20:51
+ * 功能：抽象工厂类
+ */
+public abstract class Factory {
+	public abstract Car CreateCar(); // 创建某种类型的车实例
+}
+
+```
+```
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/21 20:55
+ * 功能：奥迪汽车
+ */
+public class AudiCar extends Car {
+	@Override
+	public void engine() {
+		System.out.println("组装奥迪汽车的发动机");
+
+	}
+
+	@Override
+	public void gearbox() {
+		System.out.println("组装奥迪汽车的变速箱");
+
+	}
+
+	@Override
+	public void logo() {
+		System.out.println("组装奥迪汽车的车标");
+
+	}
+}
+
+```
+```
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/21 20:53
+ * 功能：捷达汽车品牌
+ */
+public class JettaCar extends Car {
+	@Override
+	public void engine() {
+		System.out.println("组装捷达汽车的发动机");
+	}
+
+	@Override
+	public void gearbox() {
+		System.out.println("组装捷达汽车的变速箱");
+
+	}
+
+	@Override
+	public void logo() {
+		System.out.println("组装捷达汽车的车标");
+
+	}
+}
+
+```
+```
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/21 20:54
+ * 功能：帕沙特汽车
+ */
+public class PassatCar extends Car {
+	@Override
+	public void engine() {
+		System.out.println("组装帕沙特汽车的发动机");
+
+	}
+
+	@Override
+	public void gearbox() {
+		System.out.println("组装帕沙特汽车的发动机");
+
+	}
+
+	@Override
+	public void logo() {
+		System.out.println("组装帕沙特汽车的车标");
+
+	}
+}
+
+```
+```
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/21 20:58
+ * 功能：捷达工厂方法
+ */
+public class JettaFactory extends Factory {
+	@Override
+	public Car CreateCar() {
+		return new JettaCar();
+	}
+}
+
+```
+```
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/21 20:59
+ * 功能：帕萨特工厂
+ */
+public class PassatFactory extends Factory {
+	@Override
+	public Car CreateCar() {
+		return new PassatCar();
+	}
+}
+
+```
+```
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/21 21:00
+ * 功能：奥迪工厂
+ */
+public class AudiFactory extends Factory {
+	@Override
+	public Car CreateCar() {
+		return new AudiCar();
+	}
+}
+
+```
+```
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/21 21:02
+ * 功能：汽车制造工厂（多工厂方法模板）
+ */
+public class CreateCar {
+	public static void main(String[] args) {
+		Factory jettaFactory = new JettaFactory();
+		jettaFactory.CreateCar();
+		Factory passatFactory = new PassatFactory();
+		passatFactory.CreateCar();
+		Factory audiFactory = new AudiFactory();
+		audiFactory.CreateCar();
+	}
+}
+
+```
+
+--------------------------------
+##### 带反射的工厂方法模板
+```
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/21 21:17
+ * 功能：带反射的抽象工厂
+ */
+public abstract class ReflexFactory {
+	public abstract <T extends Car> T createCar(Class<T> clazz);
+}
+
+```
+```
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/21 21:19
+ * 功能：带反射的工厂方法
+ */
+public class RealReflexFactory extends ReflexFactory {
+	@Override
+	public <T extends Car> T createCar(Class<T> clazz) {
+		Car mCar = null;
+		try {
+			mCar = (Car) Class.forName(clazz.getName()).newInstance();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return (T) mCar;
+	}
+}
+
+```
+```
+/**
+ * 作者:zwk
+ * 联系方式：497981239@qq.com
+ * 时间：on 2019/10/21 21:25
+ * 功能：通过反射的工厂方法模式创建汽车
+ */
+public class ReflexCreateCar {
+	public static void main(String[] args) {
+		ReflexFactory jettaReflexFactory = new RealReflexFactory();
+		jettaReflexFactory.createCar(JettaCar.class);
+		ReflexFactory passtaReflexFactory = new RealReflexFactory();
+		passtaReflexFactory.createCar(PassatCar.class);
+		ReflexFactory audiReflexFactory = new RealReflexFactory();
+		audiReflexFactory.createCar(AudiCar.class);
+	}
+}
+```
