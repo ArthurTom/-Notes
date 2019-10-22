@@ -251,3 +251,5 @@ public class ReflexCreateCar {
 	}
 }
 ```
+##### 源码
+[工厂方法模式demo](https://github.com/ArthurTom/-Notes/tree/master/%E5%AD%A6%E4%B9%A0%E6%BA%90%E7%A0%81/FactoryMode)
