@@ -168,3 +168,5 @@ public class ComeInMain {
 	}
 }
 ```
+##### 源码
+[抽象工厂模式demo源码](https://github.com/ArthurTom/-Notes/tree/master/%E5%AD%A6%E4%B9%A0%E6%BA%90%E7%A0%81/AbstractFactory)
